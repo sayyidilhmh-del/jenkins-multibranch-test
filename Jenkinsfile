@@ -19,10 +19,24 @@ pipeline {
                 sh 'echo "Simulasi running tests"'
             }
         }
+        stage('Fail Test') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'feature/fail-test') {
+                        sh 'exit 1'
+                    }
+                }
+            }
+        }
     }
     post {
         always {
-            echo "Pipeline selesai: ${currentBuild.result}"
+            discordSend (
+                description: "Build ${currentBuild.result} - Branch: ${env.BRANCH_NAME}",
+                title: "Jenkins Build",
+                link: env.BUILD_URL,
+                webhookUrl: 'https://discord.com/api/webhooks/1430607424624001145/knh-JtnNwCiloV8qkzQPMcaRp9-nGodL9ji5MYNgxeJhYk4ub5DzFL-GVa-q1dXP0I3e'
+            )
         }
     }
 }
